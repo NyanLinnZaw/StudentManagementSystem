@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface ClassroomRepository extends JpaRepository<Classroom, Long> {
@@ -16,6 +17,8 @@ public interface ClassroomRepository extends JpaRepository<Classroom, Long> {
     Page<Classroom> findByDeletedFalse(Pageable pageable);
 
     boolean existsByClassroomCode(String classroomCode);
+
+    long countByDeletedFalse();
 
     @Query("""
         SELECT c 
@@ -33,4 +36,15 @@ public interface ClassroomRepository extends JpaRepository<Classroom, Long> {
             @Param("keyword") String keyword,
             Pageable pageable
     );
+
+    @Query("""
+        SELECT c.id, c.classroomName, COUNT(s.id)
+        FROM Classroom c
+        LEFT JOIN Student s
+        ON s.classroom.id = c.id
+        AND s.deleted = false
+        WHERE c.deleted = false
+        GROUP BY c.id, c.classroomName
+    """)
+    List<Object[]> countStudentsByClassroom();
 }

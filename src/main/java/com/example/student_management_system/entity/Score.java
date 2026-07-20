@@ -33,4 +33,7 @@ public class Score {
     private Double averageScore;
 
     private Double gpa;
+
+    @Builder.Default
+    private Boolean deleted = false;
 }

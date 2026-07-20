@@ -1,0 +1,654 @@
+{
+  "info": {
+    "name": "Student Management System API",
+    "description": "Complete Spring Boot Student Management System API collection.\n\n1. Run Login (or Register) first.\n2. Token is saved automatically from the login/register response.\n3. Create Classroom → Subject → Student → Score in that order.\n4. Use returned IDs in path variables (or update collection variables).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8082"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "classroomId",
+      "value": "1"
+    },
+    {
+      "key": "subjectId",
+      "value": "1"
+    },
+    {
+      "key": "studentId",
+      "value": "1"
+    },
+    {
+      "key": "scoreId",
+      "value": "1"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var json = pm.response.json();",
+                  "    if (json.token) {",
+                  "        pm.collectionVariables.set('token', json.token);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Login with seeded admin. Saves JWT to collection variable `token`."
+          }
+        },
+        {
+          "name": "Register",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201 || pm.response.code === 200) {",
+                  "    var json = pm.response.json();",
+                  "    if (json.token) {",
+                  "        pm.collectionVariables.set('token', json.token);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"teacher1\",\n  \"password\": \"pass123\",\n  \"email\": \"teacher1@school.com\",\n  \"role\": \"TEACHER\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "register"]
+            },
+            "description": "Register a new user. Role: ADMIN | TEACHER | STUDENT (default STUDENT)."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Classroom",
+      "item": [
+        {
+          "name": "Create Classroom",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "    var json = pm.response.json();",
+                  "    if (json.id) {",
+                  "        pm.collectionVariables.set('classroomId', String(json.id));",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"classroomCode\": \"C001\",\n  \"classroomName\": \"Grade 10A\",\n  \"capacity\": 40\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/classrooms",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "classrooms"]
+            }
+          }
+        },
+        {
+          "name": "Update Classroom",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"classroomCode\": \"C001\",\n  \"classroomName\": \"Grade 10A Updated\",\n  \"capacity\": 45\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/classrooms/{{classroomId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "classrooms", "{{classroomId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Classroom By ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/classrooms/{{classroomId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "classrooms", "{{classroomId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Classrooms",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/classrooms?keyword=&page=0&size=10&sortBy=id&sortDir=asc",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "classrooms"],
+              "query": [
+                { "key": "keyword", "value": "" },
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "10" },
+                { "key": "sortBy", "value": "id" },
+                { "key": "sortDir", "value": "asc" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Classroom",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/classrooms/{{classroomId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "classrooms", "{{classroomId}}"]
+            },
+            "description": "Soft-delete classroom. Prefer running this last in a test flow."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Subject",
+      "item": [
+        {
+          "name": "Create Subject",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "    var json = pm.response.json();",
+                  "    if (json.id) {",
+                  "        pm.collectionVariables.set('subjectId', String(json.id));",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"subjectCode\": \"SUB001\",\n  \"subjectName\": \"Mathematics\",\n  \"description\": \"Basic Mathematics\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/subjects",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "subjects"]
+            }
+          }
+        },
+        {
+          "name": "Update Subject",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"subjectCode\": \"SUB001\",\n  \"subjectName\": \"Advanced Mathematics\",\n  \"description\": \"Updated description\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/subjects/{{subjectId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "subjects", "{{subjectId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Subject By ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/subjects/{{subjectId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "subjects", "{{subjectId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Subjects",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/subjects?keyword=&page=0&size=10&sortBy=id&sortDir=asc",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "subjects"],
+              "query": [
+                { "key": "keyword", "value": "" },
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "10" },
+                { "key": "sortBy", "value": "id" },
+                { "key": "sortDir", "value": "asc" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Subject",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/subjects/{{subjectId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "subjects", "{{subjectId}}"]
+            },
+            "description": "Soft-delete subject. Prefer running this last in a test flow."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Student",
+      "item": [
+        {
+          "name": "Create Student",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201 || pm.response.code === 200) {",
+                  "    var json = pm.response.json();",
+                  "    if (json.id) {",
+                  "        pm.collectionVariables.set('studentId', String(json.id));",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentId\": \"ST001\",\n  \"fullName\": \"John Doe\",\n  \"dateOfBirth\": \"2005-01-01\",\n  \"gender\": \"MALE\",\n  \"email\": \"john@gmail.com\",\n  \"address\": \"Yangon\",\n  \"parentPhone\": \"09123456789\",\n  \"classroomId\": {{classroomId}},\n  \"enrollmentDate\": \"2024-09-01\",\n  \"status\": \"ACTIVE\",\n  \"avatar\": null\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/students",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "students"]
+            }
+          }
+        },
+        {
+          "name": "Update Student",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentId\": \"ST001\",\n  \"fullName\": \"John Doe Updated\",\n  \"dateOfBirth\": \"2005-01-01\",\n  \"gender\": \"MALE\",\n  \"email\": \"john.updated@gmail.com\",\n  \"address\": \"Mandalay\",\n  \"parentPhone\": \"09987654321\",\n  \"classroomId\": {{classroomId}},\n  \"enrollmentDate\": \"2024-09-01\",\n  \"status\": \"ACTIVE\",\n  \"avatar\": null\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/students/{{studentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "students", "{{studentId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Student By ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/students/{{studentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "students", "{{studentId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Students",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/students?keyword=&classroomId=&page=0&size=10&sortBy=id&sortDir=asc",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "students"],
+              "query": [
+                { "key": "keyword", "value": "" },
+                { "key": "classroomId", "value": "", "description": "Optional. Example: 1" },
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "10" },
+                { "key": "sortBy", "value": "id" },
+                { "key": "sortDir", "value": "asc" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Student",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/students/{{studentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "students", "{{studentId}}"]
+            },
+            "description": "Soft-delete student. Returns 204 No Content. Prefer running this last."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Score",
+      "item": [
+        {
+          "name": "Create Score",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201 || pm.response.code === 200) {",
+                  "    var json = pm.response.json();",
+                  "    if (json.id) {",
+                  "        pm.collectionVariables.set('scoreId', String(json.id));",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentId\": {{studentId}},\n  \"subjectId\": {{subjectId}},\n  \"assignmentScore\": 8.5,\n  \"midtermScore\": 7.5,\n  \"finalScore\": 9.0\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/scores",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "scores"]
+            },
+            "description": "Scores must be between 0.0 and 10.0."
+          }
+        },
+        {
+          "name": "Update Score",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentId\": {{studentId}},\n  \"subjectId\": {{subjectId}},\n  \"assignmentScore\": 9.0,\n  \"midtermScore\": 8.0,\n  \"finalScore\": 9.5\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/scores/{{scoreId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "scores", "{{scoreId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Score By ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/scores/{{scoreId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "scores", "{{scoreId}}"]
+            }
+          }
+        },
+        {
+          "name": "Student Score Report",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/scores/student/{{studentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "scores", "student", "{{studentId}}"]
+            },
+            "description": "Uses student entity PK (id), not student_code."
+          }
+        },
+        {
+          "name": "Delete Score",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/scores/{{scoreId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "scores", "{{scoreId}}"]
+            },
+            "description": "Soft-delete score. Prefer running this last in a test flow."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "item": [
+        {
+          "name": "Get Dashboard",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/dashboard",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "dashboard"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

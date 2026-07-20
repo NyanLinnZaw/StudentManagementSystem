@@ -19,6 +19,8 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
 
     Optional<Student> findByIdAndDeletedFalse(Long id);
 
+    long countByDeletedFalse();
+
     @Query("SELECT s FROM Student s LEFT JOIN s.classroom c " +
             "WHERE s.deleted = false " +
             "AND (:keyword IS NULL OR :keyword = '' " +

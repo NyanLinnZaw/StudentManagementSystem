@@ -15,6 +15,8 @@ public interface SubjectRepository extends JpaRepository<Subject, Long> {
 
     boolean existsBySubjectCode(String subjectCode);
 
+    long countByDeletedFalse();
+
     @Query("""
         SELECT s
         FROM Subject s
