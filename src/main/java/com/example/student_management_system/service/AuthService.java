@@ -54,37 +54,4 @@ public class AuthService {
                 userDetails.getUser().getRole().getName().name()
         );
     }
-
-    public LoginResponse register(RegisterRequest request) {
-        if (userRepository.existsByUsername(request.getUsername())) {
-            throw new IllegalArgumentException("Username already exists");
-        }
-
-        if (request.getEmail() != null && !request.getEmail().isBlank()
-                && userRepository.existsByEmail(request.getEmail())) {
-            throw new IllegalArgumentException("Email already exists");
-        }
-
-        RoleName roleName = RoleName.STUDENT;
-        if (request.getRole() != null && !request.getRole().isBlank()) {
-            roleName = RoleName.valueOf(request.getRole().toUpperCase());
-        }
-
-        Role role = roleRepository.findByName(roleName)
-                .orElseThrow(() -> new IllegalArgumentException("Role not found"));
-
-        User user = new User();
-        user.setUsername(request.getUsername());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setEmail(request.getEmail());
-        user.setRole(role);
-        user.setEnabled(true);
-
-        userRepository.save(user);
-
-        CustomUserDetails userDetails = new CustomUserDetails(user);
-        String token = jwtService.generateToken(userDetails);
-
-        return new LoginResponse(token, user.getUsername(), role.getName().name());
-    }
 }

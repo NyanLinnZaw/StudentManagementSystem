@@ -25,12 +25,6 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<LoginResponse> register(@Valid @RequestBody RegisterRequest request) {
-        LoginResponse response = authService.register(request);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
-    }
-
     @PostMapping("/logout")
     public ResponseEntity<String> logout() {
         return ResponseEntity.ok("Logout successful");

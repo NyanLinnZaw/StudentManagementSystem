@@ -11,6 +11,10 @@ import com.example.student_management_system.repository.ScoreRepository;
 import com.example.student_management_system.repository.StudentRepository;
 import com.example.student_management_system.repository.SubjectRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
@@ -139,5 +143,22 @@ public class ScoreService {
 
     private Double round(Double value){
         return Math.round(value * 100.0) / 100.0;
+    }
+
+    public Page<ScoreResponse> getAllScores(String keyword, int page, int size,
+                                            String sortBy, String sortDir) {
+
+        Sort sort = Sort.by("id").ascending();
+
+        if (sortBy != null && !sortBy.isBlank()) {
+            if ("desc".equalsIgnoreCase(sortDir)) {
+                sort = Sort.by(sortBy).descending();
+            } else {
+                sort = Sort.by(sortBy).ascending();
+            }
+        }
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<Score> scores = scoreRepository.search(keyword, pageable);
+        return scores.map(this::mapToResponse);
     }
 }

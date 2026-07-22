@@ -50,7 +50,7 @@ public class StudentService {
         student.setEmail(request.getEmail());
         student.setAddress(request.getAddress());
         student.setParentPhone(request.getParentPhone());
-        student.setAvatar(request.getAvatar());
+        //student.setAvatar(request.getAvatar());
         student.setDeleted(false);
 
         if (request.getEnrollmentDate() != null) {
@@ -95,7 +95,7 @@ public class StudentService {
         student.setAddress(request.getAddress());
         student.setParentPhone(request.getParentPhone());
         student.setEnrollmentDate(request.getEnrollmentDate());
-        student.setAvatar(request.getAvatar());
+        //student.setAvatar(request.getAvatar());
 
         if (request.getStatus() != null && !request.getStatus().isBlank()) {
             student.setStatus(request.getStatus());
@@ -157,7 +157,7 @@ public class StudentService {
         response.setParentPhone(student.getParentPhone());
         response.setEnrollmentDate(student.getEnrollmentDate());
         response.setStatus(student.getStatus());
-        response.setAvatar(student.getAvatar());
+        //response.setAvatar(student.getAvatar());
 
         if (student.getClassroom() != null) {
             response.setClassroomId(student.getClassroom().getId());

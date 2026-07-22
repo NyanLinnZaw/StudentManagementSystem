@@ -1,7 +1,9 @@
 package com.example.student_management_system.controller;
 
+import com.example.student_management_system.dto.AssignStudentsRequest;
 import com.example.student_management_system.dto.ClassroomRequest;
 import com.example.student_management_system.dto.ClassroomResponse;
+import com.example.student_management_system.dto.StudentResponse;
 import com.example.student_management_system.service.ClassroomService;
 
 import jakarta.validation.Valid;
@@ -48,6 +50,31 @@ public class ClassroomController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/{id}/students")
+    @PreAuthorize("hasAnyRole('ADMIN','TEACHER')")
+    public ResponseEntity<Page<StudentResponse>> getStudentsByClassroom(
+            @PathVariable Long id,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDir
+    ) {
+        return ResponseEntity.ok(classroomService.getStudentsByClassroom(id, page, size, sortBy, sortDir));
+    }
+
+    @PostMapping("/{id}/students")
+    @PreAuthorize("hasAnyRole('ADMIN','TEACHER')")
+    public ResponseEntity<String> assignStudents(@PathVariable Long id, @Valid @RequestBody AssignStudentsRequest request){
+        classroomService.assignStudents(id, request);
+        return ResponseEntity.ok("Students assigned successfully");
+    }
+
+    @DeleteMapping("/{id}/students/{studentId}")
+    @PreAuthorize("hasAnyRole('ADMIN','TEACHER')")
+    public ResponseEntity<String> removeStudent(@PathVariable Long id, @PathVariable Long studentId) {
+        classroomService.removeStudentFromClassroom(id, studentId);
+        return ResponseEntity.ok("Student removed from classroom successfully");
+    }
 
     @GetMapping
     public ResponseEntity<Page<ClassroomResponse>> getAllClassrooms(

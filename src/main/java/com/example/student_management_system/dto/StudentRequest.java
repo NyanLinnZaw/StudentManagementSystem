@@ -25,5 +25,5 @@ public class StudentRequest {
     private Long classroomId;
     private LocalDate enrollmentDate;
     private String status;
-    private String avatar;
+    //private String avatar;
 }

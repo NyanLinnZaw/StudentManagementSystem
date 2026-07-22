@@ -6,6 +6,7 @@ import com.example.student_management_system.dto.StudentScoreReportResponse;
 import com.example.student_management_system.service.ScoreService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -51,5 +52,17 @@ public class ScoreController {
     public ResponseEntity<StudentScoreReportResponse> getStudentReport(@PathVariable Long studentId) {
         StudentScoreReportResponse response = scoreService.getStudentReport(studentId);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN','TEACHER')")
+    public ResponseEntity<Page<ScoreResponse>> getAllScores(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDir) {
+        return ResponseEntity.ok(
+                scoreService.getAllScores(keyword, page, size, sortBy, sortDir));
     }
 }

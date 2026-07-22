@@ -43,7 +43,7 @@ public class Student {
     @Builder.Default
     private String status = "ACTIVE";
 
-    private String avatar;
+    //private String avatar;
 
     @Column(nullable = false)
     @Builder.Default

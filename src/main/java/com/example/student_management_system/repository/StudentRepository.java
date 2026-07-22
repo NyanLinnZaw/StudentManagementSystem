@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface StudentRepository extends JpaRepository<Student, Long> {
@@ -19,7 +20,15 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
 
     Optional<Student> findByIdAndDeletedFalse(Long id);
 
+    Page<Student> findByClassroomIdAndDeletedFalse(Long classroomId, Pageable pageable);
+
     long countByDeletedFalse();
+
+    List<Student> findAllByIdIn(List<Long> ids);
+
+    long countByClassroomIdAndDeletedFalse(Long classroomId);
+
+    Optional<Student> findByIdAndClassroomId(Long studentId, Long classroomId);
 
     @Query("SELECT s FROM Student s LEFT JOIN s.classroom c " +
             "WHERE s.deleted = false " +
