@@ -10,20 +10,17 @@ import java.time.LocalDate;
 public class StudentRequest {
 
     private String studentId;
-
     @NotBlank(message = "Full name is required")
     private String fullName;
-
     private LocalDate dateOfBirth;
     private String gender;
-
     @Email(message = "Email must be valid")
     private String email;
-
     private String address;
     private String parentPhone;
     private Long classroomId;
     private LocalDate enrollmentDate;
     private String status;
+    private Long userId;
     //private String avatar;
 }

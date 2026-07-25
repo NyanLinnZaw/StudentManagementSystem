@@ -38,13 +38,14 @@ public class ClassroomController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN','TEACHER')")
     public ResponseEntity<String> deleteClassroom(@PathVariable Long id){
         classroomService.deleteClassroom(id);
         return ResponseEntity.ok("Classroom deleted successfully");
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN','TEACHER','STUDENT')")
     public ResponseEntity<ClassroomResponse> getClassroomById(@PathVariable Long id){
         ClassroomResponse response = classroomService.getClassroomById(id);
         return ResponseEntity.ok(response);
@@ -77,6 +78,7 @@ public class ClassroomController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN','TEACHER','STUDENT')")
     public ResponseEntity<Page<ClassroomResponse>> getAllClassrooms(
             @RequestParam(required = false) String keyword,
             @RequestParam(defaultValue = "0") int page,

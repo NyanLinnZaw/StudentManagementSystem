@@ -55,7 +55,7 @@ public class ScoreController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN','TEACHER')")
+    @PreAuthorize("hasAnyRole('ADMIN','TEACHER','STUDENT')")
     public ResponseEntity<Page<ScoreResponse>> getAllScores(
             @RequestParam(required = false) String keyword,
             @RequestParam(defaultValue = "0") int page,

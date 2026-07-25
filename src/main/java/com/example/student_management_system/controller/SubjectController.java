@@ -30,18 +30,20 @@ public class SubjectController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','TEACHER')")
     public ResponseEntity<String> deleteSubject(@PathVariable Long id) {
         subjectService.deleteSubject(id);
         return ResponseEntity.ok("Subject deleted successfully");
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','TEACHER','STUDENT')")
     public ResponseEntity<SubjectResponse> getSubjectById(@PathVariable Long id) {
         return ResponseEntity.ok(subjectService.getSubjectById(id));
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN','TEACHER','STUDENT')")
     public ResponseEntity<Page<SubjectResponse>> getAllSubjects(
             @RequestParam(required = false) String keyword,
             @RequestParam(defaultValue = "0") int page,

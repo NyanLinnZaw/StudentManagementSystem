@@ -4,10 +4,13 @@ import com.example.student_management_system.dto.StudentRequest;
 import com.example.student_management_system.dto.StudentResponse;
 import com.example.student_management_system.entity.Classroom;
 import com.example.student_management_system.entity.Student;
+import com.example.student_management_system.entity.User;
+import com.example.student_management_system.enums.RoleName;
 import com.example.student_management_system.exception.ClassroomCapacityException;
 import com.example.student_management_system.exception.ResourceNotFoundException;
 import com.example.student_management_system.repository.ClassroomRepository;
 import com.example.student_management_system.repository.StudentRepository;
+import com.example.student_management_system.repository.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -21,11 +24,14 @@ public class StudentService {
 
     private final StudentRepository studentRepository;
     private final ClassroomRepository classroomRepository;
+    private final UserRepository userRepository;
 
     public StudentService(StudentRepository studentRepository,
-                          ClassroomRepository classroomRepository) {
+                          ClassroomRepository classroomRepository,
+                          UserRepository userRepository) {
         this.studentRepository = studentRepository;
         this.classroomRepository = classroomRepository;
+        this.userRepository = userRepository;
     }
 
     public StudentResponse createStudent(StudentRequest request) {
@@ -41,8 +47,16 @@ public class StudentService {
                 && studentRepository.existsByEmail(request.getEmail())) {
             throw new IllegalArgumentException("Email already exists");
         }
+        User user = userRepository.findById(request.getUserId())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        if (!user.getRole().getName().equals(RoleName.STUDENT)) {
+            throw new IllegalArgumentException(
+                    "User role must be STUDENT"
+            );
+        }
 
         Student student = new Student();
+        student.setUser(user);
         student.setStudentId(request.getStudentId());
         student.setFullName(request.getFullName());
         student.setDateOfBirth(request.getDateOfBirth());

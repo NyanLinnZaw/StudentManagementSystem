@@ -57,6 +57,10 @@ public class Student {
     @Builder.Default
     private List<Score> scores = new ArrayList<>();
 
-    @OneToOne(mappedBy = "student")
+//    @OneToOne(mappedBy = "student")
+//    private User user;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
     private User user;
 }
