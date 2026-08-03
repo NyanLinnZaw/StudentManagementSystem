@@ -27,4 +27,5 @@ public class StudentResponse {
     private Long classroomId;
     private String classroomCode;
     private String classroomName;
+    private Long userId;
 }

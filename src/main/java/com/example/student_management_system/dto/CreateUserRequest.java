@@ -18,4 +18,7 @@ public class CreateUserRequest {
 
     @NotBlank
     private String role;
+
+    /** Required when role is STUDENT — links account to existing student by student code */
+    private String studentCode;
 }

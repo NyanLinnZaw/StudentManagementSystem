@@ -13,6 +13,8 @@ public class UserResponse {
 
     private String role;
 
+    private String studentCode;
+
 //    private Boolean enabled;
 
 }

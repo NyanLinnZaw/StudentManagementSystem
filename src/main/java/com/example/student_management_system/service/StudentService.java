@@ -4,13 +4,10 @@ import com.example.student_management_system.dto.StudentRequest;
 import com.example.student_management_system.dto.StudentResponse;
 import com.example.student_management_system.entity.Classroom;
 import com.example.student_management_system.entity.Student;
-import com.example.student_management_system.entity.User;
-import com.example.student_management_system.enums.RoleName;
 import com.example.student_management_system.exception.ClassroomCapacityException;
 import com.example.student_management_system.exception.ResourceNotFoundException;
 import com.example.student_management_system.repository.ClassroomRepository;
 import com.example.student_management_system.repository.StudentRepository;
-import com.example.student_management_system.repository.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,14 +21,11 @@ public class StudentService {
 
     private final StudentRepository studentRepository;
     private final ClassroomRepository classroomRepository;
-    private final UserRepository userRepository;
 
     public StudentService(StudentRepository studentRepository,
-                          ClassroomRepository classroomRepository,
-                          UserRepository userRepository) {
+                          ClassroomRepository classroomRepository) {
         this.studentRepository = studentRepository;
         this.classroomRepository = classroomRepository;
-        this.userRepository = userRepository;
     }
 
     public StudentResponse createStudent(StudentRequest request) {
@@ -47,16 +41,8 @@ public class StudentService {
                 && studentRepository.existsByEmail(request.getEmail())) {
             throw new IllegalArgumentException("Email already exists");
         }
-        User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        if (!user.getRole().getName().equals(RoleName.STUDENT)) {
-            throw new IllegalArgumentException(
-                    "User role must be STUDENT"
-            );
-        }
 
         Student student = new Student();
-        student.setUser(user);
         student.setStudentId(request.getStudentId());
         student.setFullName(request.getFullName());
         student.setDateOfBirth(request.getDateOfBirth());
@@ -64,7 +50,6 @@ public class StudentService {
         student.setEmail(request.getEmail());
         student.setAddress(request.getAddress());
         student.setParentPhone(request.getParentPhone());
-        //student.setAvatar(request.getAvatar());
         student.setDeleted(false);
 
         if (request.getEnrollmentDate() != null) {
@@ -83,8 +68,9 @@ public class StudentService {
             Classroom classroom = classroomRepository.findById(request.getClassroomId())
                     .orElseThrow(() -> new ResourceNotFoundException("Classroom not found"));
             int currentStudentCount = classroom.getStudents().size();
-            if(currentStudentCount >= classroom.getCapacity()) {
-                throw new ClassroomCapacityException("Classroom capacity is full. Maximum capacity is " + classroom.getCapacity());
+            if (currentStudentCount >= classroom.getCapacity()) {
+                throw new ClassroomCapacityException(
+                        "Classroom capacity is full. Maximum capacity is " + classroom.getCapacity());
             }
             student.setClassroom(classroom);
         }
@@ -109,7 +95,6 @@ public class StudentService {
         student.setAddress(request.getAddress());
         student.setParentPhone(request.getParentPhone());
         student.setEnrollmentDate(request.getEnrollmentDate());
-        //student.setAvatar(request.getAvatar());
 
         if (request.getStatus() != null && !request.getStatus().isBlank()) {
             student.setStatus(request.getStatus());
@@ -171,12 +156,15 @@ public class StudentService {
         response.setParentPhone(student.getParentPhone());
         response.setEnrollmentDate(student.getEnrollmentDate());
         response.setStatus(student.getStatus());
-        //response.setAvatar(student.getAvatar());
 
         if (student.getClassroom() != null) {
             response.setClassroomId(student.getClassroom().getId());
             response.setClassroomCode(student.getClassroom().getClassroomCode());
             response.setClassroomName(student.getClassroom().getClassroomName());
+        }
+
+        if (student.getUser() != null) {
+            response.setUserId(student.getUser().getId());
         }
 
         return response;

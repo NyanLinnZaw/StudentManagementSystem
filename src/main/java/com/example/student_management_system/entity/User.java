@@ -33,7 +33,6 @@ public class User {
     @JoinColumn(name = "role_id", nullable = false)
     private Role role;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "student_id", unique = true)
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
     private Student student;
 }
