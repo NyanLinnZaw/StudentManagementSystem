@@ -2,6 +2,7 @@ package com.example.student_management_system.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +29,7 @@ public class Classroom {
     private Integer capacity;
 
     @OneToMany(mappedBy = "classroom")
+    @SQLRestriction("deleted = false")
     @Builder.Default
     private List<Student> students = new ArrayList<>();
 

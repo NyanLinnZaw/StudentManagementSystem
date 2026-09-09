@@ -1,5 +1,6 @@
 package com.example.student_management_system.entity;
 
+import com.example.student_management_system.enums.StudentStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -39,9 +40,10 @@ public class Student {
 
     private LocalDate enrollmentDate;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Builder.Default
-    private String status = "ACTIVE";
+    private StudentStatus status = StudentStatus.ACTIVE;
 
     //private String avatar;
 

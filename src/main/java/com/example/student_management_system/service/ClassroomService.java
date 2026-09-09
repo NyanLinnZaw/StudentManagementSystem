@@ -6,6 +6,7 @@ import com.example.student_management_system.dto.ClassroomResponse;
 import com.example.student_management_system.dto.StudentResponse;
 import com.example.student_management_system.entity.Classroom;
 import com.example.student_management_system.entity.Student;
+import com.example.student_management_system.enums.StudentStatus;
 import com.example.student_management_system.exception.ResourceNotFoundException;
 import com.example.student_management_system.repository.ClassroomRepository;
 import com.example.student_management_system.repository.StudentRepository;
@@ -64,9 +65,8 @@ public class ClassroomService {
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Classroom not found"));
 
-        if (classroom.getStudents() != null &&
-                !classroom.getStudents().isEmpty()) {
-
+        long assignedStudents = studentRepository.countByClassroomIdAndDeletedFalse(id);
+        if (assignedStudents > 0) {
             throw new IllegalArgumentException(
                     "Cannot delete classroom because students are assigned."
             );
@@ -104,16 +104,13 @@ public class ClassroomService {
     }
 
     private ClassroomResponse mapToResponse(Classroom classroom) {
-        int totalStudents = 0;
-        if (classroom.getStudents() != null) {
-            totalStudents = classroom.getStudents().size();
-        }
+        long totalStudents = studentRepository.countByClassroomIdAndDeletedFalse(classroom.getId());
         return ClassroomResponse.builder()
                 .id(classroom.getId())
                 .classroomCode(classroom.getClassroomCode())
                 .classroomName(classroom.getClassroomName())
                 .capacity(classroom.getCapacity())
-                .totalStudents(totalStudents)
+                .totalStudents((int) totalStudents)
                 .build();
     }
 
@@ -153,7 +150,7 @@ public class ClassroomService {
                 .parentPhone(student.getParentPhone())
                 //.avatar(student.getAvatar())
                 .enrollmentDate(student.getEnrollmentDate())
-                .status(student.getStatus())
+                .status(student.getStatus().name())
                 .classroomId(student.getClassroom() != null ? student.getClassroom().getId() : null)
                 .classroomName(student.getClassroom() != null ? student.getClassroom().getClassroomName() : null)
                 .build();
@@ -181,8 +178,15 @@ public class ClassroomService {
         }
 
         // 4. Assign students
-        for(Student student : students){
-            if(student.getClassroom() != null){
+        for (Student student : students) {
+            if (Boolean.TRUE.equals(student.getDeleted())) {
+                throw new IllegalArgumentException("Student " + student.getStudentId() + " not found");
+            }
+            if (student.getStatus() != StudentStatus.ACTIVE) {
+                throw new IllegalArgumentException(
+                        "Only active students can be assigned to a classroom");
+            }
+            if (student.getClassroom() != null) {
                 throw new IllegalArgumentException("Student " + student.getStudentId() + " already assigned to another classroom");
             }
             student.setClassroom(classroom);

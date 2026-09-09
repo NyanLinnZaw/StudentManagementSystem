@@ -4,6 +4,7 @@ import com.example.student_management_system.entity.Student;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -32,6 +33,11 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
 
     Optional<Student> findByIdAndClassroomId(Long studentId, Long classroomId);
 
+    Optional<Student> findByUser_Id(Long userId);
+
+    @Query("SELECT s FROM Student s LEFT JOIN FETCH s.user WHERE s.id = :id AND s.deleted = false")
+    Optional<Student> findByIdAndDeletedFalseWithUser(@Param("id") Long id);
+
     @Query("SELECT s FROM Student s LEFT JOIN s.classroom c " +
             "WHERE s.deleted = false " +
             "AND (:keyword IS NULL OR :keyword = '' " +
@@ -43,4 +49,8 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
     Page<Student> search(@Param("keyword") String keyword,
                          @Param("classroomId") Long classroomId,
                          Pageable pageable);
+
+    @Modifying
+    @Query(value = "UPDATE students SET status = 'INACTIVE' WHERE status = 'DELETED'", nativeQuery = true)
+    int migrateLegacyDeletedStatus();
 }

@@ -6,6 +6,7 @@ import com.example.student_management_system.dto.StudentScoreReportResponse;
 import com.example.student_management_system.entity.Score;
 import com.example.student_management_system.entity.Student;
 import com.example.student_management_system.entity.Subject;
+import com.example.student_management_system.enums.StudentStatus;
 import com.example.student_management_system.exception.ResourceNotFoundException;
 import com.example.student_management_system.repository.ScoreRepository;
 import com.example.student_management_system.repository.StudentRepository;
@@ -34,8 +35,11 @@ public class ScoreService {
         if(exists){
             throw new IllegalArgumentException("Score already exists for this student and subject");
         }
-        Student student = studentRepository.findById(request.getStudentId())
+        Student student = studentRepository.findByIdAndDeletedFalse(request.getStudentId())
                         .orElseThrow(() -> new ResourceNotFoundException("Student not found"));
+        if (student.getStatus() != StudentStatus.ACTIVE) {
+            throw new IllegalArgumentException("Only active students can receive scores");
+        }
 
         Subject subject = subjectRepository.findById(request.getSubjectId())
                         .orElseThrow(() -> new ResourceNotFoundException("Subject not found"));
@@ -56,6 +60,9 @@ public class ScoreService {
     public ScoreResponse updateScore(Long id, ScoreRequest request){
         Score score = scoreRepository.findByIdAndDeletedFalse(id)
                         .orElseThrow(() -> new ResourceNotFoundException("Score not found"));
+        if (score.getStudent().getStatus() != StudentStatus.ACTIVE) {
+            throw new IllegalArgumentException("Only active students can receive scores");
+        }
 
         score.setAssignmentScore(request.getAssignmentScore());
         score.setMidtermScore(request.getMidtermScore());

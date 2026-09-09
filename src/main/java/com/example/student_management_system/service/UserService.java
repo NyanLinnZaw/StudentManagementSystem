@@ -6,6 +6,7 @@ import com.example.student_management_system.entity.Role;
 import com.example.student_management_system.entity.Student;
 import com.example.student_management_system.entity.User;
 import com.example.student_management_system.enums.RoleName;
+import com.example.student_management_system.enums.StudentStatus;
 import com.example.student_management_system.exception.ResourceNotFoundException;
 import com.example.student_management_system.repository.RoleRepository;
 import com.example.student_management_system.repository.StudentRepository;
@@ -58,6 +59,10 @@ public class UserService {
             if (student.getUser() != null) {
                 throw new IllegalArgumentException(
                         "This student already has an account");
+            }
+            if (student.getStatus() != StudentStatus.ACTIVE) {
+                throw new IllegalArgumentException(
+                        "Only active students can have an account");
             }
             if (student.getEmail() == null || student.getEmail().isBlank()) {
                 throw new IllegalArgumentException(
